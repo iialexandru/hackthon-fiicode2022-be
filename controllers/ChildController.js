@@ -1,5 +1,6 @@
 import Child from '../models/Child.js'
 import User from '../models/User.js'
+import QRCode from '../models/QRCode.js'
 
 export const RemoveChild = async (req, res) => {
     try {
@@ -11,7 +12,7 @@ export const RemoveChild = async (req, res) => {
         // if(!deletedChild) return res.status(404).json({ status: 'error', message: 'Not found' })
 
         await Child.deleteOne({ _id: req.params.child_id })
-
+        await QRCode.deleteOne({ url: deletedChild.url })
 
         return res.status(200).json({ status: 'ok', message: 'Child removed' })
     } catch (err) {
@@ -171,20 +172,17 @@ export const UpdateGeo = async (req, res) => {
 
         if(!child) return res.status(404).json({ status: 'error', message: 'Not found' })
 
-        console.log('a')
         if(lng && lat) {
             await Child.updateOne({ url: req.params.qrcode }, {
                 $set: { geo: { lat: lat, lng: lng } }
             })
         } else return res.status(400).json({ status: 'error', message: 'Invalid coordinates' })
-
+        const parentsIds = child.assignedParentsIds.map((id) => { return id } )
         const parent = await User.findOne({ _id: child.parentId })
         const parents = await User.findOne({ _id:  { $in: parentsIds }  })
-        console.log(parents)
 
         let danger = false, dangerMessage;
         let number = parent.fences.length
-        console.log('b')
 
         if(number !== 0) {
             for(let i = 0; i < number; i++){
@@ -196,14 +194,15 @@ export const UpdateGeo = async (req, res) => {
                 const downLat = latFence - radius * 0.0000089
                 const leftLng = lngFence - radius * 0.0000089
                 const rightLng = lngFence + radius * 0.0000089
+                console.log(upLat, downLat, leftLng, rightLng, parent.fences[i].name)
                 if(lat < upLat && lat > downLat &&  lng < rightLng && lng > leftLng){
+                    console.log('a')
                     danger = true;
                     dangerMessage = `This person entered: ${parent.fences[i].name}`
                     break;
                 }
             }
         }
-console.log('a')
 
         if(!danger && parent.length > 0 && parents) {
             for(let j = 0; j < parents.length; j++) {
@@ -218,7 +217,6 @@ console.log('a')
                     const leftLng = lngFence - radius * 0.0000089
                     const rightLng = lngFence + radius * 0.0000089
                     
-                    console.log('a') 
                     if(lat < upLat && lat > downLat && lng < rightLng && lng > leftLng){
                         danger = true;
                         dangerMessage = `This person entered: ${parent.fences[i].name}`
@@ -230,7 +228,7 @@ console.log('a')
                 }
             }
         }
-console.log(danger)
+
         if(danger && child.notifications[child.notifications.length - 1].text !== dangerMessage) {
             const value = { text: dangerMessage }
             await Child.updateOne({ url: req.params.qrcode }, {
