@@ -6,7 +6,7 @@ import User from '../models/User.js'
 const isAuthenticated = (req, res, next) => {
     try {
         const token = req.cookies['x-access-token']
-
+        const maxAge = 60 * 60 * 24 
         if(!token) return res.status(401).json({ status: 'error', message: 'User is not logged in' })
 
         jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {

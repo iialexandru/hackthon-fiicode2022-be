@@ -223,6 +223,7 @@ export const UpdateGeo = async (req, res) => {
                         break;
                     }
                 }
+                
                 if(danger) {
                     break;
                 }
@@ -265,7 +266,6 @@ export const CreateFence = async (req, res) => {
         await User.updateOne({ _id: req.userId }, {
             $push: { fences: fence }
         })
-
 
         return res.status(200).json({ status: 'ok', message: 'Fence created' })
     } catch (err) {
