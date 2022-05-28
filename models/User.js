@@ -52,6 +52,13 @@ const User = new mongoose.Schema({
         role: String,
         childName: String
     }],
+    fences: [{
+        lng: Number,
+        lat: Number,
+        radius: Number,
+        name: String,
+        location: String
+    }],
     creationDate: {
         type: Date,
         default: Date.now

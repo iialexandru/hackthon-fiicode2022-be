@@ -171,11 +171,72 @@ export const UpdateGeo = async (req, res) => {
 
         if(!child) return res.status(404).json({ status: 'error', message: 'Not found' })
 
+        console.log('a')
         if(lng && lat) {
             await Child.updateOne({ url: req.params.qrcode }, {
                 $set: { geo: { lat: lat, lng: lng } }
             })
         } else return res.status(400).json({ status: 'error', message: 'Invalid coordinates' })
+
+        const parent = await User.findOne({ _id: child.parentId })
+        const parents = await User.findOne({ _id:  { $in: parentsIds }  })
+        console.log(parents)
+
+        let danger = false, dangerMessage;
+        let number = parent.fences.length
+        console.log('b')
+
+        if(number !== 0) {
+            for(let i = 0; i < number; i++){
+                const latFence = parent.fences[i].lat 
+                const lngFence = parent.fences[i].lng
+                const radius = parent.fences[i].radius / 2
+
+                const upLat = latFence + radius * 0.0000089
+                const downLat = latFence - radius * 0.0000089
+                const leftLng = lngFence - radius * 0.0000089
+                const rightLng = lngFence + radius * 0.0000089
+                if(lat < upLat && lat > downLat &&  lng < rightLng && lng > leftLng){
+                    danger = true;
+                    dangerMessage = `This person entered: ${parent.fences[i].name}`
+                    break;
+                }
+            }
+        }
+console.log('a')
+
+        if(!danger && parent.length > 0 && parents) {
+            for(let j = 0; j < parents.length; j++) {
+                let number = parents[j].fences.length
+                for(let i = 0; i < number; i++){
+                    const latFence = parents[j].fences[i].lat 
+                    const lngFence = parents[j].fences[i].lng
+                    const radius = parents[j].fences[i].radius / 2
+                    
+                    const upLat = latFence + radius * 0.0000089
+                    const downLat = latFence - radius * 0.0000089
+                    const leftLng = lngFence - radius * 0.0000089
+                    const rightLng = lngFence + radius * 0.0000089
+                    
+                    console.log('a') 
+                    if(lat < upLat && lat > downLat && lng < rightLng && lng > leftLng){
+                        danger = true;
+                        dangerMessage = `This person entered: ${parent.fences[i].name}`
+                        break;
+                    }
+                }
+                if(danger) {
+                    break;
+                }
+            }
+        }
+console.log(danger)
+        if(danger && child.notifications[child.notifications.length - 1].text !== dangerMessage) {
+            const value = { text: dangerMessage }
+            await Child.updateOne({ url: req.params.qrcode }, {
+                $push: { notifications:  value }
+            })
+        }
 
         return res.status(200).json({ status: 'ok', message: 'Location changed' })
     } catch (err) {
@@ -196,3 +257,46 @@ export const GetGeo = async (req, res) => {
         return res.status(500).json({ status: 'error', message: 'Something went wrong', err: err.message })
     }
 }
+
+export const CreateFence = async (req, res) => {
+    try {
+        const { lat, lng, radius, pName, location } = req.body
+
+        const fence = { lat: lat, lng: lng, radius, name: pName, location }
+
+        await User.updateOne({ _id: req.userId }, {
+            $push: { fences: fence }
+        })
+
+
+        return res.status(200).json({ status: 'ok', message: 'Fence created' })
+    } catch (err) {
+        return res.status(500).json({ status: 'error', message: 'Something went wrong', err: err.message })
+    }
+} 
+
+export const GetFences = async (req, res) => {
+    try {
+        const fences = await User.find({ _id: req.userId }, 'fences')
+
+        return  res.status(200).json({ status: 'ok', message: 'Data sent', fences })
+    } catch (err) {
+        return res.status(500).json({ status: 'error', message: 'Something went wrong', err: err.message })
+    }
+}
+
+export const RemoveFence = async (req, res) => {
+    try {
+        const user = await User.findOne({ _id: req.userId })
+        
+        await User.updateMany({ _id: req.userId }, {
+            $pull: { fences: { name: req.params.name } }
+        }, { safe: true, multi: true })
+
+        
+
+        return res.status(200).json({ status: 'ok', message: 'Fence deleted' })
+    } catch (err) {
+        return res.status(500).json({ status: 'error', message: 'Something went wrong', err: err.message })
+    }
+} 

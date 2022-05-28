@@ -30,10 +30,6 @@ const Child = new mongoose.Schema({
             type: String,
             required: true
         },
-        toBeSeen: {
-            type: [mongoose.Types.ObjectId],
-            required: true
-        },
         createdAt: {
             type: Date,
             default: Date.now,
@@ -46,14 +42,6 @@ const Child = new mongoose.Schema({
     geo: {
         lat: Number,
         lng: Number
-    },
-    geoFencing: {
-        safe: [{
-            
-        }],
-        dangerous: [{
-
-        }]
     },
     assignedParentsIds: [mongoose.Types.ObjectId],
     assignedParents: [{

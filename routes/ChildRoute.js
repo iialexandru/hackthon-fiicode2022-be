@@ -1,6 +1,6 @@
 import express from 'express'
 
-import { RemoveChildSupervision, GetNotifications, RemoveChild, RemoveParentSupervision, InvitePerson, IncomingInvites, AcceptInvite, RejectInvite, UpdateGeo, GetGeo } from '../controllers/ChildController.js'
+import { CreateFence, GetFences, RemoveFence, RemoveChildSupervision, GetNotifications, RemoveChild, RemoveParentSupervision, InvitePerson, IncomingInvites, AcceptInvite, RejectInvite, UpdateGeo, GetGeo } from '../controllers/ChildController.js'
 import isUserAuthenticated from '../middlewares/isUserAuthenticated.js'
 
 const router = express.Router()
@@ -25,6 +25,12 @@ router.post('/reject-invite/:child_id', isUserAuthenticated, RejectInvite)
 router.post('/update-geo/:qrcode', UpdateGeo)
 
 router.get('/get-geo/:qrcode', isUserAuthenticated, GetGeo)
+
+router.post('/create-fence', isUserAuthenticated, CreateFence)
+
+router.get('/get-fences', isUserAuthenticated, GetFences)
+
+router.post('/remove-fence/:name', isUserAuthenticated, RemoveFence)
 
 
 export default router;
