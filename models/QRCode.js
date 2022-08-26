@@ -7,7 +7,7 @@ const QRCode = new mongoose.Schema({
     },
     createdAt: {
         type: Date,
-        defauilt: Date.now(),
+        defauilt: Date.now,
         epxires: 900
     }
 }, { collection: 'qr_codes' })

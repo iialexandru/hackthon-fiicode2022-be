@@ -14,7 +14,7 @@ const Token = new mongoose.Schema({
     },
     createdAt: {
         type: Date,
-        defauilt: Date.now(),
+        defauilt: Date.now,
         epxires: 3600
     }
 }, { collection: 'change_password_tokens' })

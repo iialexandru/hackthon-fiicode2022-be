@@ -16,9 +16,15 @@ const PORT = process.env.PORT || 9999
 
 app.set("trust proxy", 1) 
 app.use(cors({
-    origin: [ process.env.SERVER ],
+    origin: [ 'http://localhost:3000' ],
     credentials: true
 }))
+
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', [ 'http://localhost:3000' ])
+    res.setHeader('Access-Control-Allow-Credentials', true)
+    next()
+})
 
 app.use(cookieParser())
 app.use(express.json({ limit: '200mb'}))

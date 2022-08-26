@@ -194,9 +194,7 @@ export const UpdateGeo = async (req, res) => {
                 const downLat = latFence - radius * 0.0000089
                 const leftLng = lngFence - radius * 0.0000089
                 const rightLng = lngFence + radius * 0.0000089
-                console.log(upLat, downLat, leftLng, rightLng, parent.fences[i].name)
                 if(lat < upLat && lat > downLat &&  lng < rightLng && lng > leftLng){
-                    console.log('a')
                     danger = true;
                     dangerMessage = `This person entered: ${parent.fences[i].name}`
                     break;
