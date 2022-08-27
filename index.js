@@ -37,6 +37,8 @@ app.use('/api-hkt/data-homepage', DataHomePageRoute)
 app.use('/api-hkt/child', ChildRoute)
 app.use('/api-hkt/child-dashboard', ChildDashboardRoute)
 
+app.get('/', (req,res) => {return res.json({status: 'ok'})})
+
 mongoose.connect(process.env.DB_CONNECTION, () => {
     app.listen(PORT, () => {
         console.log(`Listening on port: ${PORT}`)
