@@ -6,7 +6,9 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "start": "./node_modules/.bin/netlify-lambda serve src",
+    "build": "./node_modules/.bin/netlify-lambda build src"
   },
   "keywords": [],
   "author": "",
@@ -25,8 +27,10 @@
     "joi": "^17.6.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.3.4",
+    "netlify-lambda": "^2.0.15",
     "nodemailer": "^6.7.5",
     "nodemon": "^2.0.16",
-    "react-geocode": "^0.2.3"
+    "react-geocode": "^0.2.3",
+    "serverless-http": "^3.0.2"
   }
 }
